@@ -9,7 +9,7 @@ const SunriseSunsetResponseSchema = z.object({
     sunrise: z.string(),
     sunset: z.string(),
     solar_noon: z.string().optional(),
-    day_length: z.number().optional(),
+    day_length: z.string().optional(),
     civil_twilight_begin: z.string().optional(),
     civil_twilight_end: z.string().optional(),
     nautical_twilight_begin: z.string().optional(),

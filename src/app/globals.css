@@ -1,26 +1,92 @@
 @import "tailwindcss";
 
+/* 
+ * CENTRAL COLOR THEME CONFIGURATION
+ * All color schemes should be defined here as CSS custom properties
+ * to ensure consistency across the application.
+ * 
+ * To change the color scheme, modify the values below.
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-vt323: 'VT323', monospace;
+  
+  /* Terminal color scheme */
+  --terminal-bg: #000000;         /* Black background */
+  --terminal-text: #22c55e;       /* Green text (Tailwind green-400) */
+  --terminal-border: #22c55e;     /* Green borders */
+  --terminal-dim: rgba(34, 197, 94, 0.5); /* Dimmed green for secondary text */
+  
+  /* Future theme variations could be added here:
+   * --terminal-amber: #f59e0b;   // Amber CRT style
+   * --terminal-cyan: #06b6d4;    // Cyan terminal style
+   */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-vt323);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Base body styles */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--terminal-bg);
+  color: var(--terminal-text);
+  font-family: var(--font-vt323), monospace;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+/* Terminal glow effect */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* All content should be above the glow */
+#__next {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+}
+
+/* Utility classes for consistent terminal styling */
+.terminal-bg {
+  background-color: var(--terminal-bg);
+}
+
+.terminal-text {
+  color: var(--terminal-text);
+}
+
+.terminal-border {
+  border-color: var(--terminal-border);
+}
+
+.terminal-dim {
+  color: var(--terminal-dim);
+}
+
+/* ASCII Panel component styles */
+.ascii-panel {
+  @apply border-double border-4 p-4 font-mono;
+  background-color: var(--terminal-bg);
+  color: var(--terminal-text);
+  border-color: var(--terminal-border);
+}
+
+/* Spark temperature component styles */
+.spark-temp {
+  @apply font-mono;
+  color: var(--terminal-text);
+  word-break: break-all;
+  line-height: 1;
+  display: inline-block;
+  max-width: 100%;
 }
