@@ -8,8 +8,14 @@ const SunriseSunsetResponseSchema = z.object({
   results: z.object({
     sunrise: z.string(),
     sunset: z.string(),
-    moon_phase: z.number(),
-    moon_illumination: z.number(),
+    solar_noon: z.string().optional(),
+    day_length: z.number().optional(),
+    civil_twilight_begin: z.string().optional(),
+    civil_twilight_end: z.string().optional(),
+    nautical_twilight_begin: z.string().optional(),
+    nautical_twilight_end: z.string().optional(),
+    astronomical_twilight_begin: z.string().optional(),
+    astronomical_twilight_end: z.string().optional(),
   }),
   status: z.string(),
 })
@@ -29,6 +35,32 @@ export interface AlmanacData {
 
 export class AlmanacClient {
   private sunriseSunsetUrl = 'https://api.sunrise-sunset.org/json'
+
+  // Calculate moon phase based on date
+  private calculateMoonPhase(date: Date): { phase: number; illumination: number } {
+    // Simple moon phase calculation
+    // This is an approximation - for production, consider using a proper astronomy library
+    const year = date.getFullYear()
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+
+    // Calculate days since new moon (Jan 6, 2000)
+    const baseDate = new Date(2000, 0, 6, 18, 14, 0)
+    const currentDate = new Date(year, month - 1, day, 12, 0, 0)
+    const daysSinceBase = (currentDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24)
+    
+    // Moon cycle is approximately 29.53 days
+    const lunarCycle = 29.530588853
+    const moonAge = daysSinceBase % lunarCycle
+    const phase = moonAge / lunarCycle
+
+    // Calculate illumination (simplified)
+    const illumination = phase < 0.5 
+      ? phase * 2  // Waxing: 0 to 1
+      : 2 - (phase * 2)  // Waning: 1 to 0
+
+    return { phase, illumination }
+  }
 
   async getFrostDates(lat: number, lon: number): Promise<FrostDates> {
     // Find nearest location in our data
@@ -58,9 +90,12 @@ export class AlmanacClient {
     const data = await response.json()
     const validated = SunriseSunsetResponseSchema.parse(data)
     
+    // Calculate moon phase locally
+    const { phase, illumination } = this.calculateMoonPhase(new Date())
+    
     return {
-      moonPhase: this.getMoonPhaseName(validated.results.moon_phase),
-      moonIllumination: Math.round(validated.results.moon_illumination * 100),
+      moonPhase: this.getMoonPhaseName(phase),
+      moonIllumination: Math.round(illumination * 100),
       sunrise: this.formatTime(validated.results.sunrise),
       sunset: this.formatTime(validated.results.sunset),
       frostDates,

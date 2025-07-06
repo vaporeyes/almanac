@@ -35,27 +35,31 @@ describe('AlmanacClient', () => {
     }
   })
 
-  it('should fetch moon phase data from Sunrise-Sunset API', async () => {
-    // Mock Sunrise-Sunset API response
-    const mockSunMoonResponse = {
+  it('should fetch sun data and calculate moon phase', async () => {
+    // Mock Sunrise-Sunset API response (without moon data)
+    const mockSunResponse = {
       results: {
         sunrise: '2025-01-06T13:45:00+00:00',
         sunset: '2025-01-06T23:15:00+00:00',
-        moon_phase: 0.25, // First quarter
-        moon_illumination: 0.5,
+        solar_noon: '2025-01-06T18:30:00+00:00',
+        day_length: '09:30:00',
       },
       status: 'OK',
     }
 
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: async () => mockSunMoonResponse,
+      json: async () => mockSunResponse,
     })
 
     const almanac = await client.getAlmanacData(39.7456, -97.0892)
     
-    expect(almanac.moonPhase).toBe('First Quarter')
-    expect(almanac.moonIllumination).toBe(50)
+    // Moon phase is calculated locally, so we just check it exists and is valid
+    expect(almanac.moonPhase).toBeDefined()
+    expect(['New Moon', 'Waxing Crescent', 'First Quarter', 'Waxing Gibbous', 
+            'Full Moon', 'Waning Gibbous', 'Last Quarter', 'Waning Crescent']).toContain(almanac.moonPhase)
+    expect(almanac.moonIllumination).toBeGreaterThanOrEqual(0)
+    expect(almanac.moonIllumination).toBeLessThanOrEqual(100)
     expect(almanac.sunrise).toBe('7:45 AM')
     expect(almanac.sunset).toBe('5:15 PM')
     
@@ -64,34 +68,4 @@ describe('AlmanacClient', () => {
     )
   })
 
-  it('should handle different moon phases correctly', async () => {
-    const moonPhases = [
-      { phase: 0, expected: 'New Moon' },
-      { phase: 0.125, expected: 'Waxing Crescent' },
-      { phase: 0.25, expected: 'First Quarter' },
-      { phase: 0.375, expected: 'Waxing Gibbous' },
-      { phase: 0.5, expected: 'Full Moon' },
-      { phase: 0.625, expected: 'Waning Gibbous' },
-      { phase: 0.75, expected: 'Last Quarter' },
-      { phase: 0.875, expected: 'Waning Crescent' },
-    ]
-
-    for (const { phase, expected } of moonPhases) {
-      global.fetch = vi.fn().mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          results: {
-            sunrise: '2025-01-06T13:45:00+00:00',
-            sunset: '2025-01-06T23:15:00+00:00',
-            moon_phase: phase,
-            moon_illumination: phase,
-          },
-          status: 'OK',
-        }),
-      })
-
-      const almanac = await client.getAlmanacData(39.7456, -97.0892)
-      expect(almanac.moonPhase).toBe(expected)
-    }
-  })
 })
