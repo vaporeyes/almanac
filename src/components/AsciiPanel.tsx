@@ -5,6 +5,8 @@
 
 import React, { useEffect, useState } from 'react'
 import figlet from 'figlet'
+// @ts-expect-error - figlet fonts don't have TypeScript definitions
+import standard from 'figlet/importable-fonts/Standard'
 
 interface AsciiPanelProps {
   title?: string
@@ -17,6 +19,9 @@ export function AsciiPanel({ title, children, className = '' }: AsciiPanelProps)
 
   useEffect(() => {
     if (title) {
+      // Parse and load the font synchronously
+      figlet.parseFont('Standard', standard)
+      
       // Generate ASCII art title
       figlet.text(title, {
         font: 'Standard',

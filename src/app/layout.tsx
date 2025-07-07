@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { VT323 } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const vt323 = VT323({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-vt323",
+const web437ApricotMono = localFont({
+  src: "./fonts/Web437_Apricot_Mono.woff",
+  variable: "--font-web437",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${vt323.variable} font-vt323 antialiased`}>
+      <body className={`${web437ApricotMono.variable} font-mono antialiased`}>
         {children}
       </body>
     </html>

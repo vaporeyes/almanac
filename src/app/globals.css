@@ -9,7 +9,7 @@
  */
 
 :root {
-  --font-vt323: 'VT323', monospace;
+  --font-web437: 'Web437 Apricot Mono', monospace;
   
   /* Terminal color scheme */
   --terminal-bg: #000000;         /* Black background */
@@ -24,14 +24,14 @@
 }
 
 @theme inline {
-  --font-mono: var(--font-vt323);
+  --font-mono: var(--font-web437);
 }
 
 /* Base body styles */
 body {
   background-color: var(--terminal-bg);
   color: var(--terminal-text);
-  font-family: var(--font-vt323), monospace;
+  font-family: var(--font-web437), monospace;
   font-size: 1.25rem;
   line-height: 1.2;
 }

@@ -110,4 +110,62 @@ describe('WeatherClient', () => {
     expect(current.windSpeed).toBeCloseTo(11.5, 1) // Converted to mph
     expect(current.windDirection).toBe('S')
   })
+
+  it('should fall back to forecast description when observation description is null', async () => {
+    const mockPointsResponse = {
+      properties: {
+        observationStations: 'https://api.weather.gov/stations',
+      },
+    }
+    
+    const mockStationsResponse = {
+      features: [{
+        properties: {
+          stationIdentifier: 'KICT',
+          name: 'Wichita Airport',
+        },
+      }],
+    }
+    
+    const mockObservationResponse = {
+      properties: {
+        temperature: { value: 20, unitCode: 'degC' },
+        textDescription: null, // No description available
+        windSpeed: { value: 5, unitCode: 'm/s' },
+        windDirection: { value: 180, unitCode: 'degrees' },
+        relativeHumidity: { value: 65, unitCode: 'percent' },
+      },
+    }
+
+    const mockForecastResponse = {
+      properties: {
+        periods: [{
+          shortForecast: 'Mostly Sunny',
+        }],
+      },
+    }
+
+    global.fetch = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPointsResponse,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockStationsResponse,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockObservationResponse,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockForecastResponse,
+      })
+
+    const result = await client.getCurrentConditions(39.7456, -97.0892)
+    
+    expect(result.description).toBe('Mostly Sunny')
+    expect(fetch).toHaveBeenCalledTimes(4)
+  })
 })
