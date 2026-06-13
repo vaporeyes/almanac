@@ -1,5 +1,5 @@
-// ABOUTME: Tests for SparkTemp component - validates temperature sparkline rendering
-// ABOUTME: Ensures proper ASCII sparkline generation for temperature arrays
+// ABOUTME: Tests for SparkTemp component hoverable temperature sparkline rendering
+// ABOUTME: Ensures each hourly bar exposes its temperature label
 
 import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
@@ -21,6 +21,16 @@ describe('SparkTemp', () => {
     const sparkChars = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█']
     const hasSparkChar = sparkChars.some(char => text.includes(char))
     expect(hasSparkChar).toBe(true)
+  })
+
+  it('should expose a temperature tooltip for each hourly bar', () => {
+    const { container } = render(<SparkTemp temps={[72, 68]} />)
+
+    const bars = container.querySelectorAll('.spark-temp-bar')
+    expect(bars).toHaveLength(2)
+    expect(bars[0].getAttribute('data-tooltip')).toBe('Hour 1: 72°F')
+    expect(bars[0].getAttribute('aria-label')).toBe('Hour 1: 72°F')
+    expect(bars[1].getAttribute('title')).toBe('Hour 2: 68°F')
   })
 
   it('should handle empty temperature array', () => {

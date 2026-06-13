@@ -1,3 +1,6 @@
+// ABOUTME: Root layout for the almanac weather application
+// ABOUTME: Loads global styles and the local display font variable
+
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";

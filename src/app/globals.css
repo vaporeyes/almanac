@@ -1,92 +1,341 @@
-@import "tailwindcss";
+/* ABOUTME: Global theme tokens and base styles for the almanac weather app */
+/* ABOUTME: Defines a Qt Widgets inspired desktop interface using CSS utilities */
 
-/* 
- * CENTRAL COLOR THEME CONFIGURATION
- * All color schemes should be defined here as CSS custom properties
- * to ensure consistency across the application.
- * 
- * To change the color scheme, modify the values below.
- */
+@import "tailwindcss";
 
 :root {
   --font-web437: 'Web437 Apricot Mono', monospace;
-  
-  /* Terminal color scheme */
-  --terminal-bg: #000000;         /* Black background */
-  --terminal-text: #22c55e;       /* Green text (Tailwind green-400) */
-  --terminal-border: #22c55e;     /* Green borders */
-  --terminal-dim: rgba(34, 197, 94, 0.5); /* Dimmed green for secondary text */
-  
-  /* Future theme variations could be added here:
-   * --terminal-amber: #f59e0b;   // Amber CRT style
-   * --terminal-cyan: #06b6d4;    // Cyan terminal style
-   */
+
+  --qt-desktop: #6f7f8e;
+  --qt-window: #d4d0c8;
+  --qt-panel: #ece9d8;
+  --qt-panel-dark: #c7c3b9;
+  --qt-panel-light: #ffffff;
+  --qt-text: #101010;
+  --qt-muted: #4f555b;
+  --qt-blue: #0a64ad;
+  --qt-blue-dark: #064b82;
+  --qt-border-dark: #77746d;
+  --qt-border-mid: #aca899;
+  --qt-border-light: #ffffff;
+  --qt-display: #fdfdf7;
+  --qt-focus: #3d95d8;
+
+  --terminal-bg: var(--qt-display);
+  --terminal-text: var(--qt-text);
+  --terminal-border: var(--qt-border-dark);
+  --terminal-dim: var(--qt-muted);
 }
 
 @theme inline {
   --font-mono: var(--font-web437);
 }
 
-/* Base body styles */
 body {
-  background-color: var(--terminal-bg);
-  color: var(--terminal-text);
-  font-family: var(--font-web437), monospace;
-  font-size: 1.25rem;
-  line-height: 1.2;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12) 25%, transparent 25%) 0 0 / 18px 18px,
+    linear-gradient(135deg, transparent 75%, rgba(0, 0, 0, 0.08) 75%) 0 0 / 18px 18px,
+    var(--qt-desktop);
+  color: var(--qt-text);
+  font-family: "Lucida Grande", "Segoe UI", Tahoma, Arial, sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.35;
 }
 
-/* Terminal glow effect */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* All content should be above the glow */
 #__next {
   position: relative;
-  z-index: 2;
   min-height: 100vh;
 }
 
-/* Utility classes for consistent terminal styling */
 .terminal-bg {
-  background-color: var(--terminal-bg);
+  background-color: var(--qt-display);
 }
 
 .terminal-text {
-  color: var(--terminal-text);
+  color: var(--qt-text);
 }
 
 .terminal-border {
-  border-color: var(--terminal-border);
+  border-color: var(--qt-border-mid);
 }
 
 .terminal-dim {
-  color: var(--terminal-dim);
+  color: var(--qt-muted);
 }
 
-/* ASCII Panel component styles */
-.ascii-panel {
-  @apply border-double border-4 p-4 font-mono;
-  background-color: var(--terminal-bg);
-  color: var(--terminal-text);
-  border-color: var(--terminal-border);
+.qt-window {
+  background: var(--qt-window);
+  border: 1px solid var(--qt-border-dark);
+  box-shadow:
+    inset 1px 1px 0 var(--qt-border-light),
+    inset -1px -1px 0 #5f5b55,
+    0 18px 40px rgba(0, 0, 0, 0.28);
+  touch-action: none;
+  will-change: transform;
 }
 
-/* Spark temperature component styles */
-.spark-temp {
-  @apply font-mono;
-  color: var(--terminal-text);
-  word-break: break-all;
+.qt-window-dragging {
+  box-shadow:
+    inset 1px 1px 0 var(--qt-border-light),
+    inset -1px -1px 0 #5f5b55,
+    0 24px 48px rgba(0, 0, 0, 0.35);
+}
+
+.qt-titlebar {
+  background: linear-gradient(180deg, #2f7fc2 0%, var(--qt-blue) 50%, var(--qt-blue-dark) 100%);
+  border-bottom: 1px solid #043b66;
+  color: #fff;
+  cursor: move;
+  font-weight: 700;
+  min-height: 30px;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+  user-select: none;
+}
+
+.qt-menu-slot {
+  position: relative;
+}
+
+.qt-menubar-button {
+  padding: 0.1rem 0.45rem;
+}
+
+.qt-menubar-button:hover,
+.qt-menubar-button[aria-expanded="true"] {
+  background: var(--qt-blue);
+  color: #fff;
+}
+
+.qt-menu {
+  background: var(--qt-window);
+  border-color: var(--qt-border-light) var(--qt-border-dark) var(--qt-border-dark) var(--qt-border-light);
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.22);
+  display: grid;
+  left: 0;
+  min-width: 12rem;
+  padding: 0.15rem;
+  position: absolute;
+  top: calc(100% + 1px);
+  z-index: 20;
+}
+
+.qt-menu-item {
+  padding: 0.3rem 1.5rem 0.3rem 0.45rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.qt-menu-item:disabled {
+  color: #7d7a71;
+}
+
+.qt-menu-item:not(:disabled):hover,
+.qt-menu-item:not(:disabled):focus-visible {
+  background: var(--qt-blue);
+  color: #fff;
+  outline: none;
+}
+
+.qt-window-control {
+  align-items: center;
+  background: var(--qt-window);
+  border-color: var(--qt-border-light) var(--qt-border-dark) var(--qt-border-dark) var(--qt-border-light);
+  border-style: solid;
+  border-width: 1px;
+  color: var(--qt-text);
+  display: inline-flex;
+  font-size: 0.75rem;
+  height: 18px;
+  justify-content: center;
   line-height: 1;
-  display: inline-block;
+  width: 22px;
+}
+
+.qt-menubar,
+.qt-toolbar,
+.qt-statusbar {
+  background: var(--qt-window);
+  border-color: var(--qt-border-light) var(--qt-border-mid) var(--qt-border-mid) var(--qt-border-light);
+  border-style: solid;
+  border-width: 1px;
+}
+
+.qt-toolbar-button {
+  background: var(--qt-window);
+  border-color: var(--qt-border-light) var(--qt-border-dark) var(--qt-border-dark) var(--qt-border-light);
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.65);
+  min-height: 28px;
+}
+
+.qt-toolbar-button:active {
+  border-color: var(--qt-border-dark) var(--qt-border-light) var(--qt-border-light) var(--qt-border-dark);
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+.qt-toolbar-button:disabled {
+  color: #7d7a71;
+}
+
+.qt-dialog-backdrop {
+  align-items: center;
+  background: rgba(40, 45, 50, 0.22);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 1rem;
+  position: fixed;
+  z-index: 30;
+}
+
+.qt-dialog {
+  background: var(--qt-window);
+  border-color: var(--qt-border-light) var(--qt-border-dark) var(--qt-border-dark) var(--qt-border-light);
+  border-style: solid;
+  border-width: 2px;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.25);
+  display: grid;
+  gap: 0.75rem;
+  max-width: 26rem;
+  padding: 0.75rem;
+  width: min(100%, 26rem);
+}
+
+.qt-dialog-title {
+  background: linear-gradient(180deg, #2f7fc2 0%, var(--qt-blue-dark) 100%);
+  color: #fff;
+  font-weight: 700;
+  margin: -0.75rem -0.75rem 0;
+  padding: 0.35rem 0.5rem;
+}
+
+.qt-input {
+  background: var(--qt-display);
+  border-color: var(--qt-border-dark) var(--qt-border-light) var(--qt-border-light) var(--qt-border-dark);
+  border-style: solid;
+  border-width: 2px;
+  padding: 0.35rem 0.45rem;
+}
+
+.qt-input:focus {
+  outline: 1px dotted var(--qt-text);
+  outline-offset: -4px;
+}
+
+.qt-error {
+  background: #fff2d9;
+  border: 1px solid #9c6b1f;
+  color: #5b3500;
+  padding: 0.35rem 0.45rem;
+}
+
+.ascii-panel {
+  background: var(--qt-panel);
+  border-color: var(--qt-border-light) var(--qt-border-dark) var(--qt-border-dark) var(--qt-border-light);
+  border-style: solid;
+  border-width: 2px;
+  box-shadow: inset -1px -1px 0 var(--qt-border-mid), inset 1px 1px 0 #f8f7ef;
+  color: var(--qt-text);
+  font-family: "Lucida Grande", "Segoe UI", Tahoma, Arial, sans-serif;
+  padding: 0.75rem;
+}
+
+.ascii-title {
+  align-items: center;
+  background: var(--qt-window);
+  border-color: var(--qt-border-dark) var(--qt-border-light) var(--qt-border-light) var(--qt-border-dark);
+  border-style: solid;
+  border-width: 1px;
+  color: var(--qt-text);
+  display: flex;
+  font-family: "Lucida Grande", "Segoe UI", Tahoma, Arial, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  margin: -0.35rem 0 0.75rem;
+  min-height: 24px;
+  padding: 0 0.45rem;
+  text-transform: none;
+}
+
+.panel-content {
+  min-width: 0;
+}
+
+.qt-display {
+  background: var(--qt-display);
+  border-color: var(--qt-border-dark) var(--qt-border-light) var(--qt-border-light) var(--qt-border-dark);
+  border-style: solid;
+  border-width: 2px;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.16);
+}
+
+.qt-value {
+  font-family: var(--font-web437), "Lucida Console", monospace;
+  letter-spacing: 0;
+}
+
+.qt-row {
+  border-top: 1px solid var(--qt-border-light);
+  box-shadow: 0 -1px 0 var(--qt-border-mid);
+}
+
+.spark-temp {
+  color: var(--qt-blue-dark);
+  font-family: var(--font-web437), "Lucida Console", monospace;
+  display: inline-flex;
+  flex-wrap: nowrap;
+  line-height: 1;
   max-width: 100%;
+  overflow: visible;
+  word-break: normal;
+}
+
+.spark-temp-chart {
+  padding-top: 1.5rem;
+}
+
+.spark-temp-bar {
+  cursor: default;
+  display: inline-block;
+  outline: none;
+  position: relative;
+}
+
+.spark-temp-bar:hover,
+.spark-temp-bar:focus-visible {
+  background: var(--qt-blue);
+  color: #fff;
+}
+
+.spark-temp-bar::after {
+  background: #fffbd1;
+  border-color: var(--qt-border-light) var(--qt-border-dark) var(--qt-border-dark) var(--qt-border-light);
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.22);
+  color: var(--qt-text);
+  content: attr(data-tooltip);
+  display: none;
+  font-family: "Lucida Grande", "Segoe UI", Tahoma, Arial, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  left: 50%;
+  line-height: 1.2;
+  padding: 0.25rem 0.4rem;
+  pointer-events: none;
+  position: absolute;
+  top: -2rem;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 40;
+}
+
+.spark-temp-bar:hover::after,
+.spark-temp-bar:focus-visible::after {
+  display: block;
 }

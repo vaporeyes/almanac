@@ -1,5 +1,5 @@
-// ABOUTME: Sparkline component for displaying temperature trends using unicode characters
-// ABOUTME: Creates compact visual representation of temperature data over time
+// ABOUTME: Sparkline component for displaying hoverable temperature trend bars
+// ABOUTME: Creates compact visual representation of hourly temperature data
 
 'use client'
 
@@ -15,24 +15,36 @@ export function SparkTemp({ temps, className = '' }: SparkTempProps) {
     return <span className={`spark-temp ${className}`}></span>
   }
 
-  // Unicode block characters for sparkline
   const sparkChars = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█']
-  
-  // Find min and max for scaling
   const min = Math.min(...temps)
   const max = Math.max(...temps)
-  const range = max - min || 1 // Avoid division by zero
-  
-  // Generate sparkline
-  const sparkline = temps.map(temp => {
+  const range = max - min || 1
+  const bars = temps.map((temp, hourIndex) => {
     const normalized = (temp - min) / range
     const index = Math.floor(normalized * (sparkChars.length - 1))
-    return sparkChars[Math.max(0, Math.min(sparkChars.length - 1, index))]
-  }).join('')
+    const char = sparkChars[Math.max(0, Math.min(sparkChars.length - 1, index))]
+
+    return {
+      char,
+      label: `Hour ${hourIndex + 1}: ${temp}°F`,
+      temp,
+    }
+  })
 
   return (
     <span className={`spark-temp ${className}`}>
-      {sparkline}
+      {bars.map((bar, index) => (
+        <span
+          aria-label={bar.label}
+          className="spark-temp-bar"
+          data-tooltip={bar.label}
+          key={`${index}-${bar.temp}`}
+          tabIndex={0}
+          title={bar.label}
+        >
+          {bar.char}
+        </span>
+      ))}
     </span>
   )
 }
