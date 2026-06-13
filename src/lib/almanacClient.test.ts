@@ -68,4 +68,25 @@ describe('AlmanacClient', () => {
     )
   })
 
+  it('should accept numeric day length from Sunrise-Sunset API', async () => {
+    const mockSunResponse = {
+      results: {
+        sunrise: '2025-01-06T13:45:00+00:00',
+        sunset: '2025-01-06T23:15:00+00:00',
+        day_length: 34200,
+      },
+      status: 'OK',
+    }
+
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockSunResponse,
+    })
+
+    const almanac = await client.getAlmanacData(39.7456, -97.0892)
+
+    expect(almanac.sunrise).toBe('7:45 AM')
+    expect(almanac.sunset).toBe('5:15 PM')
+  })
+
 })

@@ -2,6 +2,9 @@
 // ABOUTME: Server component that fetches and displays current weather and almanac data
 
 import { AsciiPanel, SparkTemp } from '@/components'
+import { formatDate } from '@/lib/dateFormat'
+
+export const dynamic = 'force-dynamic'
 
 // Default location (Kansas - center of US)
 const DEFAULT_LAT = 39.7456
@@ -12,7 +15,7 @@ async function getWeatherData() {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/forecast?lat=${DEFAULT_LAT}&lon=${DEFAULT_LON}`,
       { 
-        next: { revalidate: 300 }, // Cache for 5 minutes
+        cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
         }
@@ -30,12 +33,6 @@ async function getWeatherData() {
   }
 }
 
-function formatDate(date: Date): string {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  return `${months[date.getMonth()]} ${date.getDate()}`
-}
-
 export default async function Home() {
   const weatherData = await getWeatherData()
 
@@ -50,8 +47,7 @@ export default async function Home() {
   }
 
   const { current, forecast, almanac, frostDates } = weatherData
-  const firstFrostDate = new Date(frostDates.firstFrost)
-  const frostDateStr = formatDate(firstFrostDate)
+  const frostDateStr = formatDate(frostDates.firstFrost)
 
   return (
     <div className="min-h-screen p-4 md:p-8">
@@ -103,8 +99,8 @@ export default async function Home() {
               <div>Sunset: {almanac.sunset}</div>
               <div>Moon: {almanac.moonPhase} ({almanac.moonIllumination}%)</div>
               <div className="pt-2 border-t terminal-border">
-                <div>Last Frost: {formatDate(new Date(frostDates.lastFrost))}</div>
-                <div>First Frost: {formatDate(new Date(frostDates.firstFrost))}</div>
+                <div>Last Frost: {formatDate(frostDates.lastFrost)}</div>
+                <div>First Frost: {formatDate(frostDates.firstFrost)}</div>
               </div>
             </div>
           </AsciiPanel>

@@ -101,7 +101,7 @@ export class ForecastService {
   }
 
   private calculateDaysBetween(date1: Date, date2: Date): number {
-    const diffTime = Math.abs(date2.getTime() - date1.getTime())
+    const diffTime = date2.getTime() - date1.getTime()
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   }
 
@@ -116,14 +116,16 @@ export class ForecastService {
   }
 
   private getDefaultAlmanacData(): AlmanacData {
+    const currentYear = new Date().getFullYear()
+
     return {
       moonPhase: 'Unknown',
       moonIllumination: 0,
       sunrise: '6:00 AM',
       sunset: '6:00 PM',
       frostDates: {
-        firstFrost: '2025-10-15',
-        lastFrost: '2025-04-15',
+        firstFrost: `${currentYear}-10-15`,
+        lastFrost: `${currentYear}-04-15`,
       },
     }
   }

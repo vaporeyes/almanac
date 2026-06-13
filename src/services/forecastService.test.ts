@@ -119,6 +119,40 @@ describe('ForecastService', () => {
     expect(result.frostDates.daysSinceLastFrost).toBeLessThan(35)
   })
 
+  it('should report zero days until frost when the frost date is in the past', async () => {
+    const today = new Date()
+    const yesterday = new Date(today)
+    yesterday.setDate(today.getDate() - 1)
+
+    vi.mocked(mockWeatherClient.getCurrentConditions).mockResolvedValue({
+      temperature: 72,
+      description: 'Clear',
+      humidity: 65,
+      windSpeed: 11.5,
+      windDirection: 'S',
+    })
+
+    vi.mocked(mockWeatherClient.getHourlyForecast).mockResolvedValue({
+      temps: [72],
+    })
+
+    vi.mocked(mockAlmanacClient.getAlmanacData).mockResolvedValue({
+      moonPhase: 'Full Moon',
+      moonIllumination: 100,
+      sunrise: '6:00 AM',
+      sunset: '6:00 PM',
+      frostDates: {
+        firstFrost: yesterday.toISOString().split('T')[0],
+        lastFrost: yesterday.toISOString().split('T')[0],
+      },
+    })
+
+    const result = await service.getCompleteForecast(39.7456, -97.0892)
+
+    expect(result.frostDates.daysUntilFirstFrost).toBe(0)
+    expect(result.frostDates.daysSinceLastFrost).toBeGreaterThan(0)
+  })
+
   it('should handle errors gracefully with fallback data', async () => {
     vi.mocked(mockWeatherClient.getCurrentConditions).mockRejectedValue(
       new Error('Weather API error')

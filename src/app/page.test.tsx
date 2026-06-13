@@ -2,6 +2,7 @@
 // ABOUTME: Ensures proper rendering of weather data with retro styling
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { formatDate } from '@/lib/dateFormat'
 
 // Since we're testing an async Server Component, we'll test the logic separately
 describe('Home Page', () => {
@@ -10,15 +11,12 @@ describe('Home Page', () => {
   })
 
   it('should format dates correctly', () => {
-    // Test date formatting function
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    
-    // Test with a specific date
-    const testMonth = 9 // October (0-indexed)
-    const testDay = 15
-    const formatted = `${months[testMonth]} ${testDay}`
-    expect(formatted).toBe('Oct 15')
+    expect(formatDate(new Date(2026, 9, 15))).toBe('Oct 15')
+  })
+
+  it('should format date-only strings without timezone shifts', () => {
+    expect(formatDate('2026-10-15')).toBe('Oct 15')
+    expect(formatDate('2026-04-15')).toBe('Apr 15')
   })
 
   it('should have correct default location', () => {
